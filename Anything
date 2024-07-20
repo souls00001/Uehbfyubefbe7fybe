@@ -6,8 +6,8 @@ local GUI = Mercury:Create{
 	Link = "https://github.com/deeeity/mercury-lib"
 }
 GUI:Notification{
-	Title = "STK Hub Loaded",
-	Text = "Thanks For Purchasing <3",
+	Title = "Universal Ware Loaded",
+	Text = "Enjoy!",
 	Duration = 3,
 	Callback = function() end
 }
