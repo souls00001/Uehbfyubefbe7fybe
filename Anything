@@ -606,8 +606,8 @@ VisualsTab:Toggle{
 }
 
 VisualsTab:Button{
-	Name = "Show STK Users",
-	Description = "Permanently Shows STK Users In The Game",
+	Name = "Show Universal Users",
+	Description = "Permanently Shows Universal Users In The Game",
     Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/DrugScripts/sbscript/main/stkhubtext.lua"))()
    end
