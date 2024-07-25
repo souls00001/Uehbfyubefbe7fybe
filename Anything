@@ -1,12 +1,12 @@
 local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
 local GUI = Mercury:Create{
-	Name = "Universal Ware",
+	Name = "Hype Scripts",
 	Size = UDim2.fromOffset(600, 400),
 	Theme = Mercury.Themes.Rust,
 	Link = "https://github.com/deeeity/mercury-lib"
 }
 GUI:Notification{
-	Title = "Universal Ware Loaded",
+	Title = "Hype Scripts Loaded",
 	Text = "Enjoy!",
 	Duration = 3,
 	Callback = function() end
