@@ -10,7 +10,7 @@ local espEnabled = true -- Change this with your UI button
 local function createSnapline()
     local line = Drawing.new("Line")
     line.Thickness = 2
-    line.Color = Color3.fromRGB(255, 0, 0) -- Red
+    line.Color = Color3.fromRGB(255, 255, 255) -- white
     line.Transparency = 1
     line.Visible = false
     return line
