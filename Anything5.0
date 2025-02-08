@@ -1,0 +1,25 @@
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Set FOV values
+local zoomedFOV = 1  -- Zoomed in FOV
+local defaultFOV = 120 -- Default FOV
+local isZoomed = false -- Track zoom state
+
+-- Function to toggle zoom
+local function onKeyPress(input, gameProcessed)
+    if gameProcessed then return end -- Ignore if input was used by the game
+    
+    if input.KeyCode == Enum.KeyCode.R then
+        if isZoomed then
+            camera.FieldOfView = defaultFOV
+        else
+            camera.FieldOfView = zoomedFOV
+        end
+        isZoomed = not isZoomed -- Toggle state
+    end
+end
+
+-- Connect the function to UserInputService
+local UIS = game:GetService("UserInputService")
+UIS.InputBegan:Connect(onKeyPress)
