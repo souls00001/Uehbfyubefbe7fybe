@@ -8,7 +8,7 @@ local slider = script.Parent:FindFirstChild("SliderTextBox") -- Adjust to your U
 local function updateFOV()
     local fov = tonumber(slider.Text)
     if fov then
-        camera.FieldOfView = math.clamp(fov, 30, 120) -- Clamp to prevent extreme values
+        camera.FieldOfView = math.clamp(fov, 15, 120) -- Clamp to prevent extreme values
     end
 end
 
