@@ -1,15 +1,83 @@
+-- Create a LocalScript to run this in a player's character or GUI
+
+local userInputService = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
-local camera = workspace.CurrentCamera
-local UIS = game:GetService("UserInputService")
+local camera = game.Workspace.CurrentCamera
 
--- Reference your actual slider TextBox
-local slider = script.Parent:FindFirstChild("SliderTextBox") -- Adjust to your UI structure
+local fovSlider = Instance.new("Frame")
+local sliderHandle = Instance.new("Frame")
+local uiTextLabel = Instance.new("TextLabel")
+local zoomingIn = false
 
+-- Set up the UI elements
+fovSlider.Size = UDim2.new(0, 300, 0, 20)
+fovSlider.Position = UDim2.new(0.5, -150, 0.5, 100)
+fovSlider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+fovSlider.BorderSizePixel = 2
+fovSlider.Parent = player:WaitForChild("PlayerGui"):WaitForChild("ScreenGui")
+
+sliderHandle.Size = UDim2.new(0, 10, 0, 20)
+sliderHandle.Position = UDim2.new(0, 0, 0, 0)
+sliderHandle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+sliderHandle.Parent = fovSlider
+
+uiTextLabel.Size = UDim2.new(0, 200, 0, 50)
+uiTextLabel.Position = UDim2.new(0.5, -100, 0.5, -50)
+uiTextLabel.Text = "Zoom FOV: 60"
+uiTextLabel.BackgroundTransparency = 1
+uiTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+uiTextLabel.Parent = player:WaitForChild("PlayerGui"):WaitForChild("ScreenGui")
+
+-- Function to update FOV based on slider position
 local function updateFOV()
-    local fov = tonumber(slider.Text)
-    if fov then
-        camera.FieldOfView = math.clamp(fov, 15, 120) -- Clamp to prevent extreme values
-    end
+	local sliderValue = sliderHandle.Position.X.Offset
+	local fov = math.clamp(15 + (sliderValue / 290) * (120 - 15), 15, 120)
+	camera.FieldOfView = fov
+	uiTextLabel.Text = "Zoom FOV: " .. math.floor(fov)
 end
 
-slider.FocusLost:Connect(updateFOV) -- Update FOV when the player presses Enter or deselects the box
+-- Key press function to toggle zooming in/out with the R key
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	
+	if input.KeyCode == Enum.KeyCode.R then
+		zoomingIn = not zoomingIn
+		if zoomingIn then
+			-- Start zooming in
+			fovSlider.Visible = true
+			sliderHandle.Position = UDim2.new(0, 0, 0, 0)
+			updateFOV()
+		else
+			-- Reset to default zoom
+			fovSlider.Visible = false
+			camera.FieldOfView = 70
+		end
+	end
+end)
+
+-- Update the slider handle position based on user dragging
+local dragging = false
+local dragStart = nil
+
+sliderHandle.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position.X
+	end
+end)
+
+sliderHandle.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+	if dragging then
+		local delta = input.Position.X - dragStart
+		local newPos = math.clamp(sliderHandle.Position.X.Offset + delta, 0, 290)
+		sliderHandle.Position = UDim2.new(0, newPos, 0, 0)
+		dragStart = input.Position.X
+		updateFOV()
+	end
+end)
