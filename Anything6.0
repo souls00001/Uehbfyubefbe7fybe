@@ -4,9 +4,9 @@ local camera = workspace.CurrentCamera
 local localPlayer = players.LocalPlayer
 
 local snaplines = {}
-local espEnabled = false -- Default state
+local espEnabled = false -- Default: OFF
 
--- Wait for UI to load
+-- UI Setup
 local screenGui = localPlayer:WaitForChild("PlayerGui"):WaitForChild("ESP_UI")
 local enableButton = screenGui:WaitForChild("EnableESP")
 local disableButton = screenGui:WaitForChild("DisableESP")
@@ -27,9 +27,10 @@ local function setESPState(state)
     for _, line in pairs(snaplines) do
         line.Visible = espEnabled
     end
+    print("ESP Toggled:", espEnabled) -- Debug
 end
 
--- Connect buttons to enable/disable ESP
+-- Connect UI buttons
 enableButton.MouseButton1Click:Connect(function()
     setESPState(true)
 end)
@@ -38,7 +39,7 @@ disableButton.MouseButton1Click:Connect(function()
     setESPState(false)
 end)
 
--- Update snaplines each frame
+-- Update snaplines
 runService.RenderStepped:Connect(function()
     if not espEnabled then
         for _, line in pairs(snaplines) do
@@ -48,22 +49,27 @@ runService.RenderStepped:Connect(function()
     end
 
     for _, player in pairs(players:GetPlayers()) do
-        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local rootPart = player.Character.HumanoidRootPart
-            local screenPosition, onScreen = camera:WorldToViewportPoint(rootPart.Position)
+        if player ~= localPlayer and player.Character then
+            local rootPart = player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Head")
+            if rootPart then
+                local screenPosition, onScreen = camera:WorldToViewportPoint(rootPart.Position)
 
-            if not snaplines[player] then
-                snaplines[player] = createSnapline()
-            end
+                if not snaplines[player] then
+                    snaplines[player] = createSnapline()
+                end
 
-            local line = snaplines[player]
+                local line = snaplines[player]
 
-            if onScreen then
-                line.Visible = true
-                line.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y) -- Bottom center
-                line.To = Vector2.new(screenPosition.X, screenPosition.Y)
-            else
-                line.Visible = false
+                if onScreen then
+                    line.Visible = true
+                    line.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y) -- Bottom center
+                    line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+                else
+                    line.Visible = false
+                end
+
+                -- Debugging
+                print("Player:", player.Name, "ScreenPos:", screenPosition, "OnScreen:", onScreen)
             end
         elseif snaplines[player] then
             snaplines[player].Visible = false
