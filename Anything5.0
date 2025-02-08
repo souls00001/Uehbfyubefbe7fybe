@@ -2,6 +2,9 @@ local player = game.Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local UIS = game:GetService("UserInputService")
 
+-- Reference your actual slider TextBox
+local slider = script.Parent:FindFirstChild("SliderTextBox") -- Adjust to your UI structure
+
 local function updateFOV()
     local fov = tonumber(slider.Text)
     if fov then
@@ -9,8 +12,4 @@ local function updateFOV()
     end
 end
 
-slider.Changed:Connect(function(property)
-    if property == "Text" then
-        updateFOV()
-    end
-end)
+slider.FocusLost:Connect(updateFOV) -- Update FOV when the player presses Enter or deselects the box
