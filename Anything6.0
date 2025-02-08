@@ -2,27 +2,38 @@ local players = game:GetService("Players")
 local runService = game:GetService("RunService")
 local camera = workspace.CurrentCamera
 local localPlayer = players.LocalPlayer
+local starterGui = game:GetService("StarterGui")
 
 local snaplines = {}
-local espEnabled = true -- Change this with your UI button
+local espEnabled = false -- Default state
 
--- Function to create a new snapline
+-- UI Elements
+local screenGui = localPlayer:WaitForChild("PlayerGui"):WaitForChild("ESP_UI")
+local toggleButton = screenGui:WaitForChild("ToggleESP")
+
+-- Function to create a snapline
 local function createSnapline()
     local line = Drawing.new("Line")
     line.Thickness = 2
-    line.Color = Color3.fromRGB(255, 255, 255) -- white
+    line.Color = Color3.fromRGB(255, 0, 0) -- Red
     line.Transparency = 1
     line.Visible = false
     return line
 end
 
--- Function to set ESP state (Call this from your UI button)
+-- Function to toggle ESP
 local function setESPState(state)
     espEnabled = state
     for _, line in pairs(snaplines) do
         line.Visible = espEnabled
     end
+    toggleButton.Text = espEnabled and "ESP: ON" or "ESP: OFF"
 end
+
+-- Connect button click to ESP toggle
+toggleButton.MouseButton1Click:Connect(function()
+    setESPState(not espEnabled)
+end)
 
 -- Update snaplines each frame
 runService.RenderStepped:Connect(function()
@@ -56,8 +67,3 @@ runService.RenderStepped:Connect(function()
         end
     end
 end)
-
--- Example: If you have a UI button, call setESPState(true/false) when clicked
-return {
-    setESPState(true) = setESPState(false)
-}
