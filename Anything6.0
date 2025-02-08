@@ -1,0 +1,42 @@
+local players = game:GetService("Players")
+local runService = game:GetService("RunService")
+local camera = workspace.CurrentCamera
+local localPlayer = players.LocalPlayer
+
+-- Table to store snaplines
+local snaplines = {}
+
+-- Function to create a new snapline
+local function createSnapline()
+    local line = Drawing.new("Line")
+    line.Thickness = 2
+    line.Color = Color3.fromRGB(255, 255, 255) -- white
+    line.Transparency = 1
+    return line
+end
+
+-- Update snaplines each frame
+runService.RenderStepped:Connect(function()
+    for _, player in pairs(players:GetPlayers()) do
+        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = player.Character.HumanoidRootPart
+            local screenPosition, onScreen = camera:WorldToViewportPoint(rootPart.Position)
+
+            if not snaplines[player] then
+                snaplines[player] = createSnapline()
+            end
+
+            local line = snaplines[player]
+
+            if onScreen then
+                line.Visible = true
+                line.From = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y) -- Bottom center of screen
+                line.To = Vector2.new(screenPosition.X, screenPosition.Y)
+            else
+                line.Visible = false
+            end
+        elseif snaplines[player] then
+            snaplines[player].Visible = false
+        end
+    end
+end)
