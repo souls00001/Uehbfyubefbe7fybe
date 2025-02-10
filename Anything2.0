@@ -16,13 +16,13 @@ end
 
 userInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.J then
+    if input.KeyCode == Enum.KeyCode.V then
         startFlying()
     end
 end)
 
 userInputService.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.J then
+    if input.KeyCode == Enum.KeyCode.V then
         stopFlying()
     end
 end)
