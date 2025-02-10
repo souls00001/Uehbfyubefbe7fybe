@@ -4,7 +4,7 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local userInputService = game:GetService("UserInputService")
 local isFlying = false
 
-local flySpeed = 10
+local flySpeed = 15
 
 local function startFlying()
     isFlying = true
