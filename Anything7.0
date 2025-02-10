@@ -6,7 +6,7 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
-local zoomSpeed = 10 -- Distance per scroll
+local zoomSpeed = 3 -- Distance per scroll
 local zoomTime = 0.2 -- Smooth zoom duration
 local isPhasing = false -- Phase toggle state
 
