@@ -1,0 +1,79 @@
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local Camera = workspace.CurrentCamera
+
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+local lockedTarget = nil
+local isLockedOn = false
+local LOCK_RADIUS = 300  -- 🔥 Lock-on range (increase for easier locking)
+
+-- Function to get the closest valid player near the mouse
+local function getClosestTarget()
+    local character = Player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+
+    local closestTarget = nil
+    local closestDistance = LOCK_RADIUS  -- Maximum lock-on distance
+
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= Player and targetPlayer.Character then
+            local targetCharacter = targetPlayer.Character
+            local head = targetCharacter:FindFirstChild("Head")  -- Aim at the head
+
+            if head then
+                local screenPosition, onScreen = Camera:WorldToViewportPoint(head.Position)
+                if onScreen then
+                    local mouseDistance = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(screenPosition.X, screenPosition.Y)).Magnitude
+                    if mouseDistance < closestDistance then
+                        closestDistance = mouseDistance
+                        closestTarget = head
+                    end
+                end
+            end
+        end
+    end
+
+    return closestTarget
+end
+
+-- Function to lock onto a target
+local function lockOnTarget()
+    lockedTarget = getClosestTarget()
+    isLockedOn = lockedTarget ~= nil
+end
+
+-- Function to instantly snap camera to the locked target
+local function updateCamera()
+    if isLockedOn and lockedTarget then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, lockedTarget.Position)
+    end
+end
+
+-- Detect Right Click to Lock On
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then -- Right Click
+        lockOnTarget()
+    end
+end)
+
+-- Keep dynamically updating the locked target while holding right-click
+UserInputService.InputChanged:Connect(function(input, gameProcessed)
+    if isLockedOn and input.UserInputType == Enum.UserInputType.MouseMovement then
+        lockOnTarget()  -- Update target dynamically
+    end
+end)
+
+-- Detect Right Click Release to Unlock
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        isLockedOn = false
+        lockedTarget = nil
+    end
+end)
+
+-- Keep updating camera
+RunService.RenderStepped:Connect(updateCamera)
