@@ -1,0 +1,31 @@
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = game.Players.LocalPlayer
+
+-- This assumes the gun has a RemoteEvent called "Fire"
+local gun = script.Parent -- The gun should be a part of the player's tools or model
+local fireRemote = gun:FindFirstChild("Fire") -- Assuming gun has a RemoteEvent named "Fire"
+
+-- This function disables recoil
+local function disableRecoil()
+    -- If the player is shooting, we prevent camera and gun movement
+    local originalCameraCFrame = Camera.CFrame -- Store original camera position
+    local originalGunCFrame = gun.CFrame -- Store original gun position
+    
+    fireRemote.OnClientEvent:Connect(function()
+        -- Prevent any recoil effect, such as camera moving or gun rotation
+        Camera.CFrame = originalCameraCFrame
+        gun.CFrame = originalGunCFrame
+    end)
+end
+
+-- Enable no recoil
+disableRecoil()
+
+-- Optional: You can bind to the shooting input to trigger the recoil-free behavior as well.
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then  -- Left-click to shoot
+        -- Add additional custom code to handle no recoil, such as manipulating gun behavior here
+        disableRecoil()
+    end
+end)
