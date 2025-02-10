@@ -1,0 +1,47 @@
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = game.Players.LocalPlayer
+
+-- Assuming your gun has a RemoteEvent called "Fire"
+local gun = script.Parent -- The gun should be a part of the player's tools or model
+local fireRemote = gun:FindFirstChild("Fire") -- Assuming gun has a RemoteEvent named "Fire"
+local fireDirection = Vector3.new(0, 0, -1) -- Direction that the bullet will always travel
+
+-- This function disables spread and makes the bullet fire in a straight line
+local function noSpreadFire()
+    fireRemote.OnClientEvent:Connect(function(firePos)
+        -- Assuming the gun's fire direction was previously randomized
+        -- Instead of applying a spread effect, we set a fixed direction
+        local bulletStartPos = gun.Muzzle.Position -- The gun's muzzle position
+        local bulletDirection = fireDirection -- No spread: bullet always travels in this direction
+
+        -- Create bullet (simple part for example)
+        local bullet = Instance.new("Part")
+        bullet.Size = Vector3.new(0.2, 0.2, 2) -- Bullet size
+        bullet.Position = bulletStartPos
+        bullet.Anchored = true
+        bullet.CanCollide = false
+        bullet.Shape = Enum.PartType.Ball
+        bullet.Parent = workspace
+
+        -- Move the bullet in a straight line
+        local bulletVelocity = Instance.new("BodyVelocity")
+        bulletVelocity.MaxForce = Vector3.new(100000, 100000, 100000) -- High force to ensure it moves quickly
+        bulletVelocity.Velocity = bulletDirection * 200 -- Adjust speed as needed
+        bulletVelocity.Parent = bullet
+
+        -- Destroy the bullet after a short time
+        game.Debris:AddItem(bullet, 2)
+    end)
+end
+
+-- Activate no-spread firing
+noSpreadFire()
+
+-- Optional: You can bind this to the left-click input to trigger the firing action.
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        -- Call the firing function when the mouse button is pressed (if necessary)
+        fireRemote:FireServer() -- You can call your server-side function to handle the actual shooting
+    end
+end)
