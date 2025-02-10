@@ -1,5 +1,5 @@
-getgenv().animpos = 10
-getgenv().underground = -4
+getgenv().animpos = 0
+getgenv().underground = -6.50
 
 local enabled = false
 local runserv = game:GetService("RunService")
