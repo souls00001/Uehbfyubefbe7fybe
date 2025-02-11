@@ -1,0 +1,13 @@
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local PLACE_ID = game.PlaceId -- Gets the current game's ID
+
+-- Function to teleport to a random public server
+local function HopToAnotherServer()
+    TeleportService:Teleport(PLACE_ID, player) -- Teleports to a new server
+end
+
+-- Run the function
+HopToAnotherServer()
