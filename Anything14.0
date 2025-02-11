@@ -46,10 +46,20 @@ madeByLabel.BackgroundTransparency = 1
 madeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
 madeByLabel.Parent = frame
 
--- Make the UI moveable
+-- Create the Close Button (Position it exactly in the top-right corner of the frame)
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 50, 0, 50)
+closeButton.Position = UDim2.new(1, -50, 0, -50) -- Top-right corner of the frame
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Red button
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+closeButton.Parent = frame
+
+-- Create a variable to track if the frame is being dragged
 local dragging = false
 local dragInput, mousePos, framePos
 
+-- When the user starts dragging (on frame click)
 frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         dragging = true
@@ -59,13 +69,15 @@ frame.InputBegan:Connect(function(input)
     end
 end)
 
+-- While dragging, update the frame's position based on the mouse movement
 frame.InputChanged:Connect(function(input)
-    if input == dragInput then
+    if input == dragInput and dragging then
         local delta = UserInputService:GetMouseLocation() - mousePos
         frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
     end
 end)
 
+-- When the user releases the mouse, stop dragging
 frame.InputEnded:Connect(function(input)
     if input == dragInput then
         dragging = false
@@ -108,3 +120,10 @@ button.MouseButton1Click:Connect(function()
         timeLabel.Text = "Time Elapsed: 0s"  -- Reset the time
     end
 end)
+
+-- Close the UI when the close button is clicked
+closeButton.MouseButton1Click:Connect(function()
+    frame:Destroy() -- Removes the frame and all its children
+    screenGui:Destroy() -- Removes the entire screen UI
+end)
+
