@@ -1,0 +1,110 @@
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+-- Create an Anti-AFK Button
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AntiAFKGui"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Create the main frame for Anti-AFK
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 250, 0, 150)
+frame.Position = UDim2.new(0.5, -125, 0.5, -75) -- Centered
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Dark background
+frame.BorderSizePixel = 2
+frame.BorderColor3 = Color3.fromRGB(255, 255, 255) -- White border
+frame.Parent = screenGui
+
+-- Create the Enable/Disable Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 200, 0, 50)
+button.Position = UDim2.new(0.5, -100, 0.2, 0) -- Positioned inside the frame
+button.Text = "Enable Anti-AFK"
+button.BackgroundColor3 = Color3.fromRGB(0, 200, 0) -- Green button
+button.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+button.Parent = frame
+
+-- Create a TextLabel to show time elapsed
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Size = UDim2.new(0, 200, 0, 50)
+timeLabel.Position = UDim2.new(0.5, -100, 0.5, 0) -- Positioned below the button
+timeLabel.Text = "Time Elapsed: 0s"
+timeLabel.TextScaled = true
+timeLabel.BackgroundTransparency = 1
+timeLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+timeLabel.Parent = frame
+
+-- Create a "Made By HellFire Hub" label
+local madeByLabel = Instance.new("TextLabel")
+madeByLabel.Size = UDim2.new(0, 200, 0, 30)
+madeByLabel.Position = UDim2.new(0.5, -100, 0.8, 0) -- Positioned at the bottom of the frame
+madeByLabel.Text = "Made By HellFire Hub"
+madeByLabel.TextScaled = true
+madeByLabel.BackgroundTransparency = 1
+madeByLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text
+madeByLabel.Parent = frame
+
+-- Make the UI moveable
+local dragging = false
+local dragInput, mousePos, framePos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragInput = input
+        mousePos = UserInputService:GetMouseLocation()
+        framePos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input == dragInput then
+        local delta = UserInputService:GetMouseLocation() - mousePos
+        frame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input == dragInput then
+        dragging = false
+    end
+end)
+
+-- Function to simulate activity (keep player from being kicked)
+local antiAfkEnabled = false
+local startTime = 0
+local elapsedTime = 0
+
+local function SimulateActivity()
+    while antiAfkEnabled do
+        -- Simulate a slight movement by changing the mouse position
+        local currentPos = mouse.Hit.p
+        local newPos = currentPos + Vector3.new(0.1, 0, 0) -- Slightly move in x direction
+        game:GetService("Players").LocalPlayer.Character:MoveTo(newPos)
+        
+        -- Update the elapsed time
+        startTime = tick()
+        while antiAfkEnabled do
+            elapsedTime = math.floor(tick() - startTime)
+            timeLabel.Text = "Time Elapsed: " .. elapsedTime .. "s"
+            wait(1)
+        end
+        
+        wait(10) -- Simulate activity every 10 seconds
+    end
+end
+
+-- Toggle Anti-AFK on button click
+button.MouseButton1Click:Connect(function()
+    antiAfkEnabled = not antiAfkEnabled
+    if antiAfkEnabled then
+        button.Text = "Disable Anti-AFK"
+        -- Start the activity simulation
+        spawn(SimulateActivity)
+    else
+        button.Text = "Enable Anti-AFK"
+        timeLabel.Text = "Time Elapsed: 0s"  -- Reset the time
+    end
+end)
