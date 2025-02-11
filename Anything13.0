@@ -1,0 +1,14 @@
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local PLACE_ID = game.PlaceId -- Current game ID
+
+-- Function to rejoin the same server
+local function RejoinSameServer()
+    -- Teleport the player to the same server (same job ID)
+    TeleportService:TeleportToPlaceInstance(PLACE_ID, game.JobId, player)
+end
+
+-- Call the function to rejoin
+RejoinSameServer()
