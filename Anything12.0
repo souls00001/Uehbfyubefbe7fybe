@@ -1,0 +1,62 @@
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+local PLACE_ID = game.PlaceId -- Current game ID
+local player = Players.LocalPlayer
+
+-- Function to get the server with the fewest players
+local function GetSmallestServer()
+    local cursor = "" -- Used for pagination
+    local smallestServer = nil
+    local minPlayers = math.huge
+
+    while true do
+        -- Fetching the servers with a cursor for pagination
+        local url = ("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100%s"):format(PLACE_ID, cursor ~= "" and ("&cursor="..cursor) or "")
+
+        local success, response = pcall(function()
+            return HttpService:GetAsync(url)
+        end)
+
+        if success then
+            local data = HttpService:JSONDecode(response)
+
+            -- Loop through each server and find the one with the lowest players
+            for _, server in ipairs(data.data) do
+                -- Ignore the current server (same as JobId) and find the one with fewer players
+                if server.id ~= game.JobId and server.playing < minPlayers then
+                    smallestServer = server.id
+                    minPlayers = server.playing
+                end
+            end
+
+            -- If there's another page of servers, continue checking
+            if data.nextPageCursor then
+                cursor = data.nextPageCursor
+            else
+                break
+            end
+        else
+            warn("Failed to fetch servers! Roblox may be blocking requests.")
+            return nil
+        end
+    end
+
+    return smallestServer
+end
+
+-- Function to teleport to the smallest server with the fewest players
+local function HopToSmallestServer()
+    local serverId = GetSmallestServer()
+    if serverId then
+        print("Teleporting to the server with the fewest players: " .. serverId)
+        TeleportService:TeleportToPlaceInstance(PLACE_ID, serverId, player)
+    else
+        print("No servers found with fewer players. Trying a random server instead.")
+        TeleportService:Teleport(PLACE_ID, player) -- Just join a new random server if none found
+    end
+end
+
+-- Execute teleport function
+HopToSmallestServer()
