@@ -1,0 +1,36 @@
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local zoomSpeed = 3 -- Distance per scroll
+local zoomTime = 0.2 -- Smooth zoom duration
+local isPhasing = false -- Phase toggle state
+
+local function zoomCharacter()
+    if not isPhasing then
+        isPhasing = true -- Enable phasing when scrolling up
+        humanoidRootPart.CanCollide = false -- Disable collision to phase through walls
+    end
+    
+    local lookVector = humanoidRootPart.CFrame.LookVector
+    local targetCFrame = humanoidRootPart.CFrame + (lookVector * zoomSpeed)
+
+    local tweenInfo = TweenInfo.new(zoomTime, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = targetCFrame})
+
+    tween:Play()
+end
+
+local function onInputChanged(input, gameProcessed)
+    if gameProcessed then return end
+
+    if input.UserInputType == Enum.UserInputType.MouseWheel and input.Position.Z > 0 then
+        zoomCharacter() -- Scroll up to phase and move forward
+    end
+end
+
+UserInputService.InputChanged:Connect(onInputChanged)
