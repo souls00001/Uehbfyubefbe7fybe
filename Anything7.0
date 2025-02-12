@@ -44,7 +44,7 @@ end
 local function onInputBegan(input, gameProcessed)
     if gameProcessed then return end
 
-    if input.KeyCode == Enum.KeyCode.nil then
+    if input.KeyCode == Enum.KeyCode.F then
         togglePhase()
     end
 end
