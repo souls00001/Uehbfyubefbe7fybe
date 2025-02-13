@@ -15,7 +15,7 @@ local function createBillboardGui(character)
         textLabel.Size = UDim2.new(1, 0, 1, 0)
         textLabel.BackgroundTransparency = 0.5
         textLabel.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black background
-        textLabel.TextColor3 = Color3.new(1, 1, 1)        -- White text
+        textLabel.TextColor3 = Color3.new(230, 60, 0)        -- White text
         textLabel.TextStrokeTransparency = 0
         textLabel.TextScaled = true
         textLabel.Font = Enum.Font.SourceSansBold
