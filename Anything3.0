@@ -33,8 +33,8 @@ local RadarInfo = {
     RadarBorder = Color3.fromRGB(75, 75, 75),
     LocalPlayerDot = Color3.fromRGB(230, 60, 0),
     PlayerDot = Color3.fromRGB(230, 60, 0),
-    Team = Color3.fromRGB(0, 255, 0),
-    Enemy = Color3.fromRGB(255, 0, 0),
+    Team = Color3.fromRGB(255, 0, 0),
+    Enemy = Color3.fromRGB(230, 60, 0),
     Health_Color = true,
     Team_Check = true
 }
