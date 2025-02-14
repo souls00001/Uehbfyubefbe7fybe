@@ -1,0 +1,16 @@
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+
+local function pressE()
+    -- Simulate key press (E)
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    wait(0.5) -- Hold E for 0.5 seconds
+    -- Simulate key release (E)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+-- Repeatedly press "E" every 0.5 seconds
+while true do
+    pressE()  -- This will press and release "E"
+    wait(0.5)  -- Adjust interval as needed
+end
