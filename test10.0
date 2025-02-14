@@ -1,0 +1,22 @@
+    local baseplateSize = Vector3.new(10000000000, 0, 10000000000)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local function SpawnBaseplate()
+    local baseplatePosition = humanoidRootPart.Position + Vector3.new(0, -3.3, 0)
+    local baseplate = Instance.new("Part")
+    baseplate.Size = baseplateSize
+    baseplate.Position = baseplatePosition
+    baseplate.Anchored = true
+    baseplate.CanCollide = true
+    baseplate.Parent = game.Workspace
+    baseplate.BrickColor = BrickColor.new("Dark stone grey")
+    baseplate.Material = Enum.Material.Concrete
+    end
+    game.Players.LocalPlayer.CharacterAdded:Connect(function()
+     SpawnBaseplate()
+    end)
+    if game.Players.LocalPlayer.Character then
+    SpawnBaseplate()
+    end
+    end
