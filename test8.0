@@ -1,0 +1,30 @@
+local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            if Value then
+                if IsSpectating then
+                    return
+                end
+
+                local TargetPlayer = Players:FindFirstChild(TargetName)
+
+                if TargetPlayer and TargetPlayer.Character then
+                    originalCameraSubject = workspace.CurrentCamera.CameraSubject
+                    workspace.CurrentCamera.CameraSubject = TargetPlayer.Character:FindFirstChild("Humanoid")
+                    IsSpectating = true
+                else
+                    CreateNotification({
+                        Title = "Error",
+                        Text = "Invalid Name",
+                        ButtonText = "Okay",
+                        Duration = 99999
+                    })
+                end
+            else
+                if IsSpectating then
+                    workspace.CurrentCamera.CameraSubject = originalCameraSubject
+                    IsSpectating = false
+                end
+            end
+        end,
+    })
