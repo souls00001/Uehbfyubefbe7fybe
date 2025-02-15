@@ -20,7 +20,6 @@ local locations = {
     {position = Vector3.new(-463, 4, -474), item = nil, waitTime = 5},        -- Third location (wait 5s)
     {position = Vector3.new(-487, 4, -535), item = "Flour", waitTime = 5},   -- Fourth location (wait 5s)
     {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 62}, -- Fifth location (wait 62s)
-    {position = Vector3.new(-32, 4, -25), item = "Potato Chips"} -- Sixth location
 }
 
 -- Function to press "E" once
