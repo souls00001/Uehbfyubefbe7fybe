@@ -11,7 +11,7 @@ if not ReplicatedStorage:FindFirstChild("TeleportEvent") then
 end
 
 local player = game.Players.LocalPlayer
-local movementSpeed = 20 -- Speed in studs per second
+local movementSpeed = 16 -- Speed in studs per second
 local isActive = false -- Track if the script is active or not
 
 local locations = {
