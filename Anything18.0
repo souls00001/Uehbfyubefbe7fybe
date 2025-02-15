@@ -15,11 +15,15 @@ local movementSpeed = 16 -- Speed in studs per second
 local isActive = false -- Track if the script is active or not
 
 local locations = {
-    {position = Vector3.new(-479, 4, -436), item = "Potato", waitTime = 2},  -- First location (wait 2s)
-    {position = Vector3.new(-463, 4, -448), item = "Potato", waitTime = 5},  -- Second location (wait 5s)
-    {position = Vector3.new(-463, 4, -474), item = nil, waitTime = 5},        -- Third location (wait 5s)
-    {position = Vector3.new(-487, 4, -535), item = "Flour", waitTime = 5},   -- Fourth location (wait 5s)
-    {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 62}, -- Fifth location (wait 62s)
+    {position = Vector3.new(-479, 4, -436), item = nil, waitTime = 5, pressE = true},  
+    {position = Vector3.new(-463, 4, -448), item = "Potato", waitTime = 5, pressE = true},  
+    {position = Vector3.new(-463, 4, -474), item = nil, waitTime = 5, pressE = true},  
+    {position = Vector3.new(-467, 4, -475), item = nil, waitTime = 5, pressE = true},  
+    {position = Vector3.new(-467, 4, -537), item = nil, waitTime = 2, pressE = false},  
+    {position = Vector3.new(-487, 4, -535), item = "Flour", waitTime = 5, pressE = true},  
+    {position = Vector3.new(-467, 4, -537), item = nil, waitTime = 3, pressE = false},  
+    {position = Vector3.new(-466, 4, -477), item = nil, waitTime = 2, pressE = false},  
+    {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 62, pressE = true},  
 }
 
 -- Function to press "E" once
@@ -44,8 +48,8 @@ end
 
 -- Function to move the character gradually to target positions
 local function moveToTarget(index)
-    if not isActive then return end  -- Stop if not active
-    if index > #locations then index = 1 end  -- Restart from the first location if all are completed
+    if not isActive then return end  
+    if index > #locations then index = 1 end  
 
     local location = locations[index]
     local targetPosition = location.position
@@ -67,41 +71,18 @@ local function moveToTarget(index)
             humanoidRootPart.CFrame = CFrame.new(targetPosition)
             moveConnection:Disconnect()
             
-            -- Equip item if necessary
             if location.item then
                 equipItem(location.item)
             end
             
-            -- Press E when arriving at the first location
-            if index == 1 then
-                pressEOnce()  -- Press E immediately when arriving at the first location
-            end
-            
-            -- Press E at the start of the fourth location
-            if index == 4 then
-                pressEOnce()  -- Press E immediately when arriving at the fourth location
-            end
-            
-            -- Press E at the start of the fifth location (not the fourth)
-            if index == 5 then
-                pressEOnce()  -- Press E immediately when arriving at the fifth location
-                wait(62)      -- Wait for 62 seconds at the fifth location
-            else
-                -- Press E for all other locations
+            if location.pressE then
                 pressEOnce()
             end
             
-            -- Wait 5 seconds at the fourth location
-            if index == 4 then
-                wait(5)
-            end
-            
-            -- Wait if needed for other locations
             if location.waitTime then
                 wait(location.waitTime)
             end
             
-            -- Move to next location
             moveToTarget(index + 1)
         end
     end)
@@ -110,17 +91,16 @@ end
 -- Function to toggle the activity on Z press
 local function toggleSequence(input)
     if input.KeyCode == Enum.KeyCode.Z then
-        isActive = not isActive  -- Toggle the isActive flag
+        isActive = not isActive  
         if isActive then
             print("Starting movement sequence.")
-            moveToTarget(1)  -- Start from the first location
+            moveToTarget(1)  
         else
             print("Stopping movement sequence.")
         end
     end
 end
 
--- Connect the toggle to the key press
 game:GetService("UserInputService").InputBegan:Connect(toggleSequence)
 
 -- Function to remove HoldDuration from all ProximityPrompts
