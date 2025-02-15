@@ -19,7 +19,7 @@ local locations = {
     {position = Vector3.new(-463, 4, -448), item = "Potato", waitTime = 5},  -- Second location (wait 5s)
     {position = Vector3.new(-463, 4, -474), item = nil, waitTime = 5},        -- Third location (wait 5s)
     {position = Vector3.new(-487, 4, -535), item = "Flour", waitTime = 5},   -- Fourth location (wait 5s)
-    {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 64}, -- Fifth location (wait 64s)
+    {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 62}, -- Fifth location (wait 62s)
     {position = Vector3.new(-32, 4, -25), item = "Potato Chips"} -- Sixth location
 }
 
@@ -86,7 +86,7 @@ local function moveToTarget(index)
             -- Press E at the start of the fifth location (not the fourth)
             if index == 5 then
                 pressEOnce()  -- Press E immediately when arriving at the fifth location
-                wait(60)      -- Wait for 60 seconds at the fifth location
+                wait(62)      -- Wait for 62 seconds at the fifth location
             else
                 -- Press E for all other locations
                 pressEOnce()
