@@ -1,0 +1,187 @@
+        -- Services
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+local movementSpeed = 20 -- Speed in studs per second
+
+-- Ensure RemoteEvent exists for server teleport
+if not ReplicatedStorage:FindFirstChild("TeleportEvent") then
+    local teleportEvent = Instance.new("RemoteEvent")
+    teleportEvent.Name = "TeleportEvent"
+    teleportEvent.Parent = ReplicatedStorage
+end
+
+local teleportPosition1 = Vector3.new(218, 4, -332) -- First desired coordinates
+local teleportPosition2 = Vector3.new(-49, 4, -322) -- Second desired coordinates
+local teleportPosition3 = Vector3.new(-42, 4, -332) -- New desired coordinates after 30 seconds
+
+-- Boolean flag to control the loop
+local isLooping = false
+
+-- Function to press "E" once
+local function pressEOnce()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    wait(0.5) -- Hold E for 0.5 seconds
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+-- Function to spam "E" for 11 seconds
+local function spamE()
+    local endTime = tick() + 11 -- Set the end time to 11 seconds from now
+    while tick() < endTime do
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        wait(0.1) -- Press E every 0.1 seconds
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        wait(0.1) -- Wait 0.1 seconds before pressing "E" again
+    end
+end
+
+-- Function to find and equip an item called "Card" in the player's inventory
+local function equipCard()
+    local backpack = player.Backpack
+    for _, item in ipairs(backpack:GetChildren()) do
+        if item.Name == "Card" then
+            -- Assuming the "Card" is a tool, we can equip it
+            if item:IsA("Tool") then
+                -- Equip the Card (set it as the active tool)
+                player.Character.Humanoid:EquipTool(item)
+                print("Card equipped!")
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Function to find the "Fake ID" in the player's inventory and hold it out
+local function equipFakeID()
+    local backpack = player.Backpack
+    for _, item in ipairs(backpack:GetChildren()) do
+        if item.Name == "Fake ID" then
+            -- Assuming the Fake ID is a tool, we can equip it
+            if item:IsA("Tool") then
+                -- Equip the Fake ID (set it as the active tool)
+                player.Character.Humanoid:EquipTool(item)
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Function to move the character gradually to the target position
+local function moveToTarget(targetPosition, callback)
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = player.Character.HumanoidRootPart
+        local startPosition = humanoidRootPart.Position
+        local distance = (targetPosition - startPosition).magnitude
+        local duration = distance / movementSpeed -- Calculate time to reach the target
+
+        -- Step 1: Move gradually to the target position
+        local startTime = tick()
+        local targetTime = startTime + duration
+
+        -- Continuous movement towards target position
+        local moveConnection
+        moveConnection = RunService.Heartbeat:Connect(function()
+            local elapsedTime = tick() - startTime
+            if elapsedTime < duration then
+                -- Calculate the new position based on time and speed
+                local newPosition = startPosition:Lerp(targetPosition, elapsedTime / duration)
+                humanoidRootPart.CFrame = CFrame.new(newPosition)
+            else
+                -- Once the target is reached, stop setting CFrame and allow movement
+                humanoidRootPart.CFrame = CFrame.new(targetPosition) -- Ensure final position is correct
+                moveConnection:Disconnect() -- Stop the connection after the move is completed
+
+                -- If we are at the first position, press "E"
+                if targetPosition == teleportPosition1 then
+                    pressEOnce() -- Press "E" once after arrival at the first position
+                end
+
+                -- If we are at the second position, press "E"
+                if targetPosition == teleportPosition2 then
+                    pressEOnce() -- Press "E" once after arrival at the second position
+                    spamE() -- Spam "E" for 11 seconds after arrival at the second position
+                end
+
+                -- Check for the Fake ID in the inventory and equip it
+                if equipFakeID() then
+                    print("Fake ID equipped!")
+                else
+                    print("No Fake ID found in the inventory.")
+                end
+
+                -- Callback to move to the next location
+                if callback then
+                    callback() -- Call the callback function if provided (for next movement)
+                end
+            end
+        end)
+    end
+end
+
+-- Function to remove HoldDuration from all ProximityPrompts
+local function modifyProximityPrompts()
+    while true do
+        local proximityPrompts = game:GetService("Workspace"):GetDescendants()
+        for _, instance in ipairs(proximityPrompts) do
+            if instance:IsA("ProximityPrompt") then
+                instance.HoldDuration = 0
+            end
+        end
+        wait(20) -- Run every 20 seconds
+    end
+end
+
+-- Start modifying ProximityPrompts in a separate thread
+task.spawn(modifyProximityPrompts)
+
+-- Function to handle Z key press for toggling the loop
+local function toggleLoop()
+    -- Toggle the looping state
+    isLooping = not isLooping
+    if isLooping then
+        print("Looping started.")
+        -- Start the loop
+        while isLooping do
+            moveToTarget(teleportPosition1, function()
+                -- After reaching the first position, move to the second position
+                moveToTarget(teleportPosition2, function()
+                    -- After reaching the second position, spam E for 11 seconds
+                    print("Player has reached the second position and is spamming E!")
+
+                    -- Wait 30 seconds before moving to the new coordinates
+                    wait(32)
+
+                    -- Move to the new desired position (-42, 4, -332) after 30 seconds
+                    -- Equip the Card one second before reaching the third position
+                    local moveTime = tick()
+                    moveToTarget(teleportPosition3 - Vector3.new(0, 0, 1), function()
+                        -- Equip Card 1 second before reaching the third position
+                        if tick() - moveTime >= 1 then
+                            equipCard() 
+                        end
+
+                        -- After reaching the third position, press "E"
+                        pressEOnce()
+                        print("Player has reached the third position and pressed E!")
+                    end)
+                end)
+            end)
+            -- Optional: Add a wait or delay before repeating the loop to avoid performance issues
+            wait(90)  -- 90-second delay before starting the loop again
+        end
+    else
+        print("Looping stopped.")
+    end
+end
+
+-- Detect Z key press to toggle the loop
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Z then
+        toggleLoop()
+    end
+end)
