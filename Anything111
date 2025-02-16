@@ -1,4 +1,16 @@
-
+local function dashForward(distance)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local startPos = hrp.Position
+            enableNoclip()
+            hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * distance
+            wait(0)  
+            disableNoclip()
+        end
+    end
+end
 
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
