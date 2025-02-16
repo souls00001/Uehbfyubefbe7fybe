@@ -128,8 +128,9 @@ end
 
 -- Detect Z key press to toggle the loop
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.Z then
-        toggleLoop()
+    if gameProcessed then return end  -- Ignore input if it's already processed by something else
+    if input.KeyCode == Enum.KeyCode.Z then  -- Change this to X if you want X key
+        toggleLoop()  -- Call toggleLoop to start/stop the loop
     end
 end)
+
