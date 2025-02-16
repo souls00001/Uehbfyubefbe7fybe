@@ -3,7 +3,7 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
-local movementSpeed = 20 -- Speed in studs per second
+local movementSpeed = 16 -- Speed in studs per second
 
 -- Ensure RemoteEvent exists for server teleport
 if not ReplicatedStorage:FindFirstChild("TeleportEvent") then
