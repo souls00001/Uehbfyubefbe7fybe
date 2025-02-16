@@ -2,6 +2,7 @@
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 -- Ensure RemoteEvent exists for server teleport
 if not ReplicatedStorage:FindFirstChild("TeleportEvent") then
@@ -24,6 +25,7 @@ local locations = {
     {position = Vector3.new(-467, 4, -537), item = nil, waitTime = 3, pressE = false},  
     {position = Vector3.new(-466, 4, -477), item = nil, waitTime = 2, pressE = false},  
     {position = Vector3.new(-520, 4, -474), item = nil, waitTime = 62, pressE = true},  
+    {position = Vector3.new(-466, 4, -477), item = nil, waitTime = 2, pressE = false},  
 }
 
 -- Function to press "E" once
@@ -49,7 +51,7 @@ end
 -- Function to move the character gradually to target positions
 local function moveToTarget(index)
     if not isActive then return end  
-    if index > #locations then index = 1 end  
+    if index > #locations then index = 1 end  -- Reset to 1 after the last location
 
     local location = locations[index]
     local targetPosition = location.position
@@ -76,14 +78,36 @@ local function moveToTarget(index)
             end
             
             if location.pressE then
-                pressEOnce()
+                pressEOnce()  -- Press E at the start of this location
             end
             
             if location.waitTime then
                 wait(location.waitTime)
             end
-            
-            moveToTarget(index + 1)
+
+            -- On the third step, move the camera down
+            if index == 3 then
+                local camera = game.Workspace.CurrentCamera
+                local offset = Vector3.new(0, -1, 0)  -- Move the camera 1 stud down
+                local targetCFrame = camera.CFrame * CFrame.new(offset)
+
+                local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)  -- 1 second duration
+                local tween = TweenService:Create(camera, tweenInfo, {CFrame = targetCFrame})
+                tween:Play()
+            end
+
+            -- At the 9th location (position -520, 4, -474), press "E" again after wait
+            if index == 9 then
+                pressEOnce()  -- Press E at the end of this location
+            end
+
+            -- After the last location (9th), restart the movement sequence
+            if index == #locations then
+                print("Sequence complete, restarting...")
+                moveToTarget(1)  -- Start from the first location again
+            else
+                moveToTarget(index + 1)
+            end
         end
     end)
 end
