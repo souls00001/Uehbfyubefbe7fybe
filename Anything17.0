@@ -21,7 +21,6 @@ local teleportPositions = {
     Vector3.new(-50, 4, -320), -- 5th (wait 43 sec & spam E)
     Vector3.new(-42, 4, -332), -- 6th
     Vector3.new(-43, 4, -354)  -- 7th
-	Vector3.new(216, 4, -355), -- 2nd
 }
 
 -- Boolean flag to control the loop
@@ -126,11 +125,12 @@ local function toggleLoop()
     end
 end
 
--- Detect Z key press to toggle the loop
+-- Detect X key press to toggle the loop
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end  -- Ignore input if it's already processed by something else
-    if input.KeyCode == Enum.KeyCode.Z then  -- Change this to X if you want X key
+    if input.KeyCode == Enum.KeyCode.X then  -- Changed to X key
         toggleLoop()  -- Call toggleLoop to start/stop the loop
     end
 end)
+
 
