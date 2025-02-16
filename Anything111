@@ -1,0 +1,95 @@
+local function dashForward(distance)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local startPos = hrp.Position
+            enableNoclip()
+            hrp.CFrame = hrp.CFrame + hrp.CFrame.LookVector * distance
+            wait(0)  
+            disableNoclip()
+        end
+    end
+end
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local zoomSpeed = 3 -- Distance per scroll
+local zoomTime = 0.2 -- Smooth zoom duration
+local isPhasing = false -- Phase toggle state
+local keybind = nil -- Keybind starts as nil
+local isListeningForKey = false
+
+-- Function to toggle phasing on/off
+local function togglePhase()
+    isPhasing = not isPhasing
+
+    if isPhasing then
+        humanoidRootPart.CanCollide = false -- Disable collision to phase through walls
+        humanoidRootPart.Transparency = 0.5 -- Visual indicator
+    else
+        humanoidRootPart.CanCollide = true -- Re-enable collision
+        humanoidRootPart.Transparency = 0 -- Restore normal appearance
+    end
+end
+
+-- Function to smoothly move the player forward while phasing
+local function zoomCharacter()
+    if not isPhasing then return end -- Only zoom if phasing is enabled
+
+    local lookVector = humanoidRootPart.CFrame.LookVector
+    local targetCFrame = humanoidRootPart.CFrame + (lookVector * zoomSpeed)
+
+    local tweenInfo = TweenInfo.new(zoomTime, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(humanoidRootPart, tweenInfo, {CFrame = targetCFrame})
+
+    tween:Play()
+end
+
+-- Detects mouse wheel scrolling for zooming
+local function onInputChanged(input, gameProcessed)
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.MouseWheel and input.Position.Z > 0 then
+        zoomCharacter() -- Zoom forward
+    end
+end
+
+-- Handles keybind detection and toggling phase
+local function onInputBegan(input, gameProcessed)
+    if gameProcessed then return end
+
+    -- If waiting for keybind input, set keybind and exit listening mode
+    if isListeningForKey and input.UserInputType == Enum.UserInputType.Keyboard then
+        keybind = input.KeyCode
+        isListeningForKey = false
+        print("Keybind set to: " .. tostring(keybind))
+    elseif keybind and input.KeyCode == keybind then
+        togglePhase() -- Toggle phasing on key press
+    elseif keybind == nil then
+        print("No keybind set! Use setKeybind() to assign a key.")
+    end
+end
+
+-- Function to allow users to set a new keybind
+function setKeybind()
+    isListeningForKey = true
+    print("Press a key to set as the new keybind")
+end
+
+-- Reconnects character components when the player respawns
+local function onCharacterAdded(newCharacter)
+    character = newCharacter
+    humanoidRootPart = newCharacter:WaitForChild("HumanoidRootPart")
+end
+
+player.CharacterAdded:Connect(onCharacterAdded)
+UserInputService.InputBegan:Connect(onInputBegan)
+UserInputService.InputChanged:Connect(onInputChanged)
+
+-- Add Toggle to UI
