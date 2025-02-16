@@ -9,6 +9,8 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local zoomSpeed = 3 -- Distance per scroll
 local zoomTime = 0.2 -- Smooth zoom duration
 local isPhasing = false -- Phase toggle state
+local keybind = nil -- Keybind initially nil
+local isListeningForKey = false
 
 -- Function to toggle phasing on/off
 local function togglePhase()
@@ -44,9 +46,18 @@ end
 local function onInputBegan(input, gameProcessed)
     if gameProcessed then return end
 
-    if input.KeyCode == Enum.KeyCode.F then
+    if isListeningForKey and input.UserInputType == Enum.UserInputType.Keyboard then
+        keybind = input.KeyCode
+        isListeningForKey = false
+        print("Keybind set to: " .. tostring(keybind))
+    elseif keybind and input.KeyCode == keybind then
         togglePhase()
     end
+end
+
+function setKeybind()
+    isListeningForKey = true
+    print("Press a key to set as the keybind")
 end
 
 UserInputService.InputBegan:Connect(onInputBegan)
