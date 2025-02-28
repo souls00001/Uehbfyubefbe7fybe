@@ -1,6 +1,4 @@
-    loadstring(game:HttpGetAsync("https://pastebin.com/raw/xsTkyCXW", true))();
-end;
---
+
 local default_color = Color3.fromRGB(150, 0, 0);
 local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/judghementday2/paradox.co/refs/heads/main/UI.lua'))({
     cheatname = 'Paradox',
