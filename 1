@@ -1,0 +1,71 @@
+local Settings = {
+    Tracer_Color = Color3.fromRGB(255, 255, 255),
+    Tracer_Thickness = 1,
+    Tracer_Origin = "Bottom", -- Middle or Bottom if FollowMouse is on this won't matter...
+    Tracer_FollowMouse = false,
+    Tracers = true
+}
+
+local player = game:GetService("Players").LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local mouse = player:GetMouse()
+
+local function NewLine(thickness, color)
+    local line = Drawing.new("Line")
+    line.Visible = false
+    line.From = Vector2.new(0, 0)
+    line.To = Vector2.new(0, 0)
+    line.Color = color 
+    line.Thickness = thickness
+    line.Transparency = 1
+    return line
+end
+
+local function Visibility(state, lib)
+    lib.Visible = state
+end
+
+local function ESP(plr)
+    local tracer = NewLine(Settings.Tracer_Thickness, Settings.Tracer_Color)
+
+    local function Updater()
+        local connection
+        connection = game:GetService("RunService").RenderStepped:Connect(function()
+            if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local HumPos, OnScreen = camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
+                if OnScreen and Settings.Tracers then
+                    if Settings.Tracer_Origin == "Middle" then
+                        tracer.From = camera.ViewportSize * 0.5
+                    elseif Settings.Tracer_Origin == "Bottom" then
+                        tracer.From = Vector2.new(camera.ViewportSize.X * 0.5, camera.ViewportSize.Y)
+                    end
+                    if Settings.Tracer_FollowMouse then
+                        tracer.From = Vector2.new(mouse.X, mouse.Y + 36)
+                    end
+                    tracer.To = Vector2.new(HumPos.X, HumPos.Y)
+                    Visibility(true, tracer)
+                else
+                    Visibility(false, tracer)
+                end
+            else
+                Visibility(false, tracer)
+                if not game.Players:FindFirstChild(plr.Name) then
+                    connection:Disconnect()
+                end
+            end
+        end)
+    end
+    coroutine.wrap(Updater)()
+end
+
+for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+    if v.Name ~= player.Name then
+        coroutine.wrap(ESP)(v)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(newplr)
+    if newplr.Name ~= player.Name then
+        coroutine.wrap(ESP)(newplr)
+    end
+end)
