@@ -1,0 +1,59 @@
+local PlaceID = game.PlaceId
+local AllIDs = {}
+local foundAnything = ""
+local actualHour = os.date("!*t").hour
+
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+
+local success, response = pcall(function()
+    return HttpService:JSONDecode(readfile("NotSameServers.json"))
+end)
+
+if success and type(response) == "table" then
+    AllIDs = response
+else
+    AllIDs = { actualHour }
+    writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+end
+
+function TPReturner()
+    local Site
+    if foundAnything == "" then
+        Site = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Desc&limit=100'))
+    else
+        Site = HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Desc&limit=100&cursor=' .. foundAnything))
+    end
+
+    if Site.nextPageCursor then
+        foundAnything = Site.nextPageCursor
+    end
+
+    local bestServer = nil
+    local maxPlayers = 0
+
+    for _, v in pairs(Site.data) do
+        if v.playing < v.maxPlayers and v.playing > maxPlayers and not table.find(AllIDs, v.id) then
+            bestServer = v.id
+            maxPlayers = v.playing
+        end
+    end
+
+    if bestServer then
+        table.insert(AllIDs, bestServer)
+        writefile("NotSameServers.json", HttpService:JSONEncode(AllIDs))
+
+        TeleportService:TeleportToPlaceInstance(PlaceID, bestServer, Players.LocalPlayer)
+    else
+        warn("No suitable servers found.")
+    end
+end
+
+function Teleport()
+    while true do
+        pcall(TPReturner)
+        wait(5)
+end
+
+Teleport()
