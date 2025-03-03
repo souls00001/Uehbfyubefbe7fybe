@@ -1,0 +1,35 @@
+        local lowQualityParts = true
+    local deleteDecalsAndTextures = true
+    local disableShaodws = true
+
+
+
+    local lightning = game:GetService("Lighting")
+
+    if disableShadows then
+        lightning.GlobalShadows = false 
+    end
+
+
+    if deleteDecalsAndTextures then
+        local Model = workspace
+        local ClassTypes = {
+            "Decal",
+            "Texture"
+        }
+
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if table.find(ClassTypes, v.ClassName) then
+                print(v.ClassName)
+                v:Destroy()
+            end
+        end
+    end
+
+    if lowQualityParts then
+        for i,v in pairs(workspace:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+            end
+        end
+    end
