@@ -1,0 +1,31 @@
+local function SpawnBaseplateUnderFeet()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    local baseplatePosition = humanoidRootPart.Position + Vector3.new(0, -10.9, 0)  -- Adjust height as needed
+    local baseplate = Instance.new("Part")
+    baseplate.Size = Vector3.new(10000000, 0, 10000000)  -- Original large size
+    baseplate.Position = baseplatePosition
+    baseplate.Anchored = true
+    baseplate.CanCollide = true
+    baseplate.Parent = game.Workspace
+    baseplate.BrickColor = BrickColor.new("Bright blue")  -- Original color
+    baseplate.Material = Enum.Material.Concrete  -- Original material
+end
+
+local function SpawnBaseplateAtMiddle()
+    local middlePosition = Vector3.new(0, 0, 0)
+    local baseplate = Instance.new("Part")
+    baseplate.Size = Vector3.new(10000000, 0, 10000000)  -- Original large size
+    baseplate.Position = middlePosition
+    baseplate.Anchored = true
+    baseplate.CanCollide = true
+    baseplate.Parent = game.Workspace
+    baseplate.BrickColor = BrickColor.new("Bright blue")  -- Original color
+    baseplate.Material = Enum.Material.Concrete  -- Original material
+end
+
+local function onFloorFixButtonClick()
+    SpawnBaseplateUnderFeet()
+    SpawnBaseplateAtMiddle()
+end
