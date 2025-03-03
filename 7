@@ -1,0 +1,23 @@
+local Plr = game:GetService("Players").LocalPlayer
+local Mouse = Plr:GetMouse()
+local deleteEnabled = false
+
+-- Function to handle deletion when mouse button is pressed
+Mouse.Button1Down:Connect(function()
+    if not deleteEnabled then
+        return
+    end
+    if not game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.C) then
+        return
+    end
+    if not Mouse.Target then
+        return
+    end
+    -- Destroy the target if the conditions are met
+    Mouse.Target:Destroy()
+end)
+
+-- Toggle function to update the deleteEnabled state
+local function OnToggleChanged(toggleState)
+    deleteEnabled = toggleState
+end
