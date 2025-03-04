@@ -1,0 +1,52 @@
+local noClipEnabled = false
+local massivePart
+local function handleNoClip()
+    if noClipEnabled then
+        massivePart = Instance.new("Part")
+        massivePart.Size = Vector3.new(15000, 50, 15000)
+        massivePart.Anchored = true
+        massivePart.CanCollide = true
+        massivePart.Transparency = 1
+        massivePart.Name = "PART_345345345345345345"
+        massivePart.Parent = workspace
+
+        local function disableCollisions()
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj and localPlayer.Character and obj:IsA("BasePart") and not obj:IsDescendantOf(localPlayer.Character) and obj.Name ~= massivePart.Name then
+                    obj.CanCollide = false
+                end
+            end
+            workspace.DescendantAdded:Connect(function(object)
+                if object and localPlayer.Character and object:IsA("BasePart") and not object:IsDescendantOf(localPlayer.Character) and object.Name ~= massivePart.Name then
+                    object.CanCollide = false
+                end
+            end)
+        end
+
+        disableCollisions()
+
+        runService.RenderStepped:Connect(function()
+            if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local rootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+                local rayOrigin = rootPart.Position
+                local rayDirection = Vector3.new(0, -1000, 0)
+
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {localPlayer.Character, massivePart}
+                raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+                local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+                if raycastResult then
+                    massivePart.CFrame = CFrame.new(raycastResult.Position - Vector3.new(0, 25, 0))
+                else
+                    massivePart.CFrame = CFrame.new(rootPart.Position - Vector3.new(0, 28, 0))
+                end
+            end
+        end)
+
+    else
+        if massivePart then massivePart:Destroy() end
+        print("NoClip disabled")
+    end
+end
